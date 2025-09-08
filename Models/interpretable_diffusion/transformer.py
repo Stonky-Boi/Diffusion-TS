@@ -2,7 +2,7 @@ import math
 import torch
 import torch.nn.functional as F
 from torch import nn
-from model_utils import (
+from .model_utils import (
     Conv_MLP,
     GELU2,
     AdaLayerNorm,
@@ -303,3 +303,4 @@ class Transformer(nn.Module):
             return trend, self.combine_s(season.transpose(1, 2)).transpose(1, 2), res - res_m
 
         return trend, season_error
+
