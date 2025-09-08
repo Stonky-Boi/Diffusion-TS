@@ -44,35 +44,28 @@ class EEGDataset(Dataset):
         self.sample_num = self.samples.shape[0]
 
     def read_data(self, filepath, length):
-        """
-        Reads the data from the given filepath, removes outliers, classifies the data into two classes,
-        and scales the data using MinMaxScaler.
+        from scipy.io import arff
 
-        Args:
-            filepath (str): Path to the .arff file containing the EEG data.
-            length (int): Length of the window for classification.
-        """
-        data = arff.loadarff(filepath)
-        df = pd.DataFrame(data[0])
-        df['eyeDetection'] = df['eyeDetection'].astype('int')
+        if filepath.endswith(".arff"):
+            data = arff.loadarff(filepath)
+            df = pd.DataFrame(data[0])
+        elif filepath.endswith(".csv"):
+            df = pd.read_csv(filepath)
+        else:
+            raise ValueError(f"Unsupported file type: {filepath}")
 
+        df['eyeDetection'] = df['eyeDetection'].astype(int)
         df = self.__OutlierRemoval__(df)
         df_0, df_1 = self.__Classify__(df, length=length)
-        # df_0.to_csv('./EEG_Eye_State_0.csv', index=False)
-        # df_1.to_csv('./EEG_Eye_State_1.csv', index=False)
 
         data_0 = df_0.values.reshape(df_0.shape[0], length, -1)
         data_1 = df_1.values.reshape(df_1.shape[0], length, -1)
 
-        # print(f"Class 0: {data_0.shape}, Class 1: {data_1.shape}")
-
         data = np.vstack([data_0.reshape(-1, data_0.shape[-1]), data_1.reshape(-1, data_1.shape[-1])])
-
-        scaler = MinMaxScaler()
-        scaler = scaler.fit(data)
+        scaler = MinMaxScaler().fit(data)
 
         return data_0, data_1, scaler
-    
+
     @staticmethod
     def __OutlierRemoval__(df):
         """
