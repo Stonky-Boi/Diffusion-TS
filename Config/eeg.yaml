@@ -58,7 +58,7 @@ dataloader:
   train_dataset:
     target: Utils.Data_utils.eeg_dataset.EEGDataset
     params:
-      data_root: ../Data/datasets/EEG_Eye_State.arff
+      data_root: ../Data/EEG_Eye_State.csv
       window: 24  # seq_length
       save2npy: True
       neg_one_to_one: True
@@ -66,4 +66,5 @@ dataloader:
 
   batch_size: 128
   sample_size: 256
+
   shuffle: True
